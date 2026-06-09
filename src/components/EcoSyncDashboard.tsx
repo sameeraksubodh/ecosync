@@ -19,7 +19,6 @@ import {
   ChevronRight,
   Award,
   Zap,
-  Recycle,
   UtensilsCrossed,
   Car,
   Lightbulb,
@@ -79,9 +78,14 @@ function CO2Chart({ data }: { data: ChartData[] }) {
   });
 
   return (
-    <div className="flex flex-col items-center" data-testid="co2-chart">
-      <div className="relative w-52 h-52">
-        <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
+    <figure className="flex flex-col items-center" data-testid="co2-chart" aria-labelledby="chart-title">
+      <div className="relative w-52 h-52" role="img" aria-label={`CO2 breakdown chart showing ${total} kg total emissions`}>
+        <svg
+          viewBox="0 0 200 200"
+          className="w-full h-full transform -rotate-90"
+          role="presentation"
+          aria-hidden="true"
+        >
           {segments.map((s, i) => (
             <path
               key={i}
@@ -94,19 +98,27 @@ function CO2Chart({ data }: { data: ChartData[] }) {
           ))}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold text-gray-800" data-testid="chart-total">{total}</span>
-          <span className="text-sm text-gray-500">kg CO2</span>
+          <span className="text-3xl font-bold text-gray-800" data-testid="chart-total" aria-hidden="true">{total}</span>
+          <span className="text-sm text-gray-500" aria-hidden="true">kg CO2</span>
+          <span className="sr-only">{total} kilograms of CO2</span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3 mt-4 w-full">
+      <figcaption className="sr-only" id="chart-title">
+        Weekly CO2 breakdown by category
+      </figcaption>
+      <ul className="grid grid-cols-3 gap-3 mt-4 w-full" role="list" aria-label="CO2 breakdown by category">
         {segments.map((s, i) => (
-          <div key={i} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/60 border border-gray-100">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
-            <p className="text-xs font-medium text-gray-700 truncate">{s.category}</p>
-          </div>
+          <li key={i} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/60 border border-gray-100">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: s.color }}
+              aria-hidden="true"
+            />
+            <span className="text-xs font-medium text-gray-700 truncate">{s.category}: {s.value}kg</span>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </figure>
   );
 }
 
@@ -115,33 +127,52 @@ function VirtualForest({ credits }: { credits: number }) {
   const growth = (credits % 100) / 100;
 
   return (
-    <div className="relative h-48 bg-gradient-to-b from-teal-100/50 to-emerald-50/30 rounded-xl overflow-hidden border border-emerald-100" data-testid="virtual-forest">
-      <CloudSun className="absolute top-3 right-4 w-8 h-8 text-amber-400 animate-float" />
-      <div className="absolute bottom-0 left-0 right-0 h-16">
+    <figure
+      className="relative h-48 bg-gradient-to-b from-teal-100/50 to-emerald-50/30 rounded-xl overflow-hidden border border-emerald-100"
+      data-testid="virtual-forest"
+      aria-labelledby="forest-label"
+    >
+      <CloudSun
+        className="absolute top-3 right-4 w-8 h-8 text-amber-400"
+        aria-hidden="true"
+      />
+      <div className="absolute bottom-0 left-0 right-0 h-16" aria-hidden="true">
         <Mountain className="absolute bottom-0 left-1/4 w-24 h-16 text-gray-200/40 transform -translate-x-1/2" />
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-emerald-400/60 to-emerald-300/40 rounded-b-xl" />
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+      <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-emerald-400/60 to-emerald-300/40 rounded-b-xl" aria-hidden="true" />
+      <ul
+        className="absolute bottom-4 left-0 right-0 flex justify-center gap-2"
+        aria-label={`${trees + 1} trees in your virtual forest`}
+        role="list"
+      >
         {Array.from({ length: Math.min(trees + 1, 7) }).map((_, i) => (
-          <TreePine
-            key={i}
-            className={`w-8 h-10 ${
-              i === trees ? 'text-teal-400' : 'text-emerald-500'
-            }`}
-            style={{
-              transform: `scale(${i === trees ? 0.6 + growth * 0.4 : 1})`,
-              opacity: i === trees ? 0.5 + growth * 0.5 : 1,
-            }}
-          />
+          <li key={i}>
+            <TreePine
+              className={`w-8 h-10 ${
+                i === trees ? 'text-teal-400' : 'text-emerald-500'
+              }`}
+              style={{
+                transform: `scale(${i === trees ? 0.6 + growth * 0.4 : 1})`,
+                opacity: i === trees ? 0.5 + growth * 0.5 : 1,
+              }}
+              aria-hidden="true"
+            />
+          </li>
         ))}
-      </div>
+      </ul>
       <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
         <div className="flex items-center gap-1.5">
-          <TreeDeciduous className="w-4 h-4 text-emerald-600" />
-          <span className="text-sm font-semibold text-emerald-700" data-testid="tree-count">{trees} trees</span>
+          <TreeDeciduous className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+          <span
+            className="text-sm font-semibold text-emerald-700"
+            data-testid="tree-count"
+            id="forest-label"
+          >
+            {trees} trees
+          </span>
         </div>
       </div>
-    </div>
+    </figure>
   );
 }
 
@@ -161,22 +192,49 @@ function KPICard({
   trendUp?: boolean;
 }) {
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-emerald-100/50 shadow-lg rounded-xl p-4" data-testid="kpi-card">
+    <article
+      className="bg-white/80 backdrop-blur-sm border border-emerald-100/50 shadow-lg rounded-xl p-4"
+      data-testid="kpi-card"
+      aria-labelledby={`kpi-title-${title.toLowerCase().replace(/\s+/g, '-')}`}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-gray-500 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-800" data-testid="kpi-value">{value}</p>
-          <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
+          <h3
+            id={`kpi-title-${title.toLowerCase().replace(/\s+/g, '-')}`}
+            className="text-sm text-gray-500 mb-1"
+          >
+            {title}
+          </h3>
+          <p
+            className="text-2xl font-bold text-gray-800"
+            data-testid="kpi-value"
+            aria-describedby={`kpi-subtitle-${title.toLowerCase().replace(/\s+/g, '-')}`}
+          >
+            {value}
+          </p>
+          <p
+            id={`kpi-subtitle-${title.toLowerCase().replace(/\s+/g, '-')}`}
+            className="text-xs text-gray-400 mt-1"
+          >
+            {subtitle}
+          </p>
         </div>
-        <div className="p-2.5 bg-emerald-50 rounded-xl">{icon}</div>
+        <div className="p-2.5 bg-emerald-50 rounded-xl" aria-hidden="true">{icon}</div>
       </div>
       {trend && (
-        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100">
-          <TrendingDown className={`w-4 h-4 ${trendUp ? 'text-emerald-600' : 'text-red-500 rotate-180'}`} />
-          <span className={`text-xs font-medium ${trendUp ? 'text-emerald-600' : 'text-red-500'}`}>{trend}</span>
+        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100" role="status" aria-live="polite">
+          <TrendingDown
+            className={`w-4 h-4 ${trendUp ? 'text-emerald-600' : 'text-red-500 rotate-180'}`}
+            aria-hidden="true"
+          />
+          <span
+            className={`text-xs font-medium ${trendUp ? 'text-emerald-600' : 'text-red-500'}`}
+          >
+            {trend}
+          </span>
         </div>
       )}
-    </div>
+    </article>
   );
 }
 
@@ -216,33 +274,46 @@ function ReceiptScanner() {
   const totalCO2 = parsedItems.reduce((sum, item) => sum + item.co2, 0);
 
   return (
-    <div data-testid="receipt-scanner">
-      <div className="flex items-center gap-2 mb-4">
-        <Camera className="w-5 h-5 text-teal-600" />
-        <h3 className="font-semibold text-gray-800">Receipt-to-Impact Scanner</h3>
-      </div>
+    <section data-testid="receipt-scanner" aria-labelledby="scanner-title">
+      <header className="flex items-center gap-2 mb-4">
+        <Camera className="w-5 h-5 text-teal-600" aria-hidden="true" />
+        <h3 id="scanner-title" className="font-semibold text-gray-800">Receipt-to-Impact Scanner</h3>
+      </header>
 
       {isComplete ? (
-        <div className="animate-slide-up" data-testid="analysis-complete">
-          <div className="flex items-center justify-between mb-4">
+        <div className="animate-slide-up" data-testid="analysis-complete" role="status" aria-live="polite">
+          <header className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" aria-hidden="true" />
               <h4 className="font-semibold text-gray-800">Receipt Analyzed</h4>
             </div>
-            <button onClick={handleReset} className="text-xs text-gray-500">Upload New</button>
-          </div>
-          <div className="space-y-2 mb-4">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded px-2 py-1"
+              aria-label="Upload a new receipt"
+            >
+              Upload New
+            </button>
+          </header>
+          <ul className="space-y-2 mb-4" role="list" aria-label="Parsed receipt items">
             {parsedItems.map((item, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-gray-100">
+              <li key={i} className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-gray-100">
                 <span className="text-sm text-gray-700">{item.name}</span>
                 <span className="text-sm font-medium text-gray-800">{item.co2}kg CO2</span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
           <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-emerald-700">Total Impact</span>
-              <span className="text-xl font-bold text-emerald-800" data-testid="total-co2">{totalCO2.toFixed(1)}kg CO2</span>
+              <span
+                className="text-xl font-bold text-emerald-800"
+                data-testid="total-co2"
+                aria-label={`${totalCO2.toFixed(1)} kilograms of CO2`}
+              >
+                {totalCO2.toFixed(1)}kg CO2
+              </span>
             </div>
           </div>
         </div>
@@ -253,82 +324,155 @@ function ReceiptScanner() {
               ? 'border-emerald-500 bg-emerald-50/50'
               : 'border-gray-200 hover:border-emerald-400'
           }`}
+          role="region"
+          aria-busy={isUploading || isAnalyzing}
+          aria-live="polite"
         >
           {isUploading || isAnalyzing ? (
             <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" data-testid="loading-spinner" />
-              <p className="text-sm text-gray-600">
+              <Loader2
+                className="w-10 h-10 text-emerald-600 animate-spin"
+                data-testid="loading-spinner"
+                aria-hidden="true"
+              />
+              <p className="text-sm text-gray-600" role="status">
                 {isUploading ? 'Uploading receipt...' : 'AI analyzing receipt items...'}
               </p>
             </div>
           ) : (
             <>
-              <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+              <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" aria-hidden="true" />
               <p className="text-sm font-medium text-gray-700 mb-1">Drag & drop your receipt</p>
               <button
+                type="button"
                 onClick={handleUpload}
-                className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-medium px-4 py-2 rounded-lg mt-4 hover:from-emerald-700"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-medium px-4 py-2 rounded-lg mt-4 hover:from-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                 data-testid="scan-button"
+                aria-label="Scan and analyze your receipt"
               >
-                <Camera className="w-4 h-4 inline mr-2" />
+                <Camera className="w-4 h-4 inline mr-2" aria-hidden="true" />
                 Scan Receipt
               </button>
             </>
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
-function ChallengeCard({ challenge }: { challenge: Challenge }) {
+function ChallengeCard({ challenge }: { challenge: Challenge & { icon: React.ReactNode } }) {
   const [isClaimed, setIsClaimed] = useState(false);
   const progressPercent = Math.min((challenge.progress / challenge.total) * 100, 100);
   const isComplete = challenge.progress >= challenge.total;
+  const progressId = `progress-${challenge.id}`;
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-emerald-100/50 shadow-lg rounded-xl p-4" data-testid="challenge-card">
+    <article
+      className="bg-white/80 backdrop-blur-sm border border-emerald-100/50 shadow-lg rounded-xl p-4"
+      data-testid="challenge-card"
+      aria-labelledby={`challenge-title-${challenge.id}`}
+      aria-describedby={`challenge-desc-${challenge.id}`}
+    >
       <div className="flex items-start gap-3">
-        <div className={`p-2.5 rounded-xl shrink-0 ${challenge.locked ? 'bg-gray-100 text-gray-400' : isComplete ? 'bg-emerald-100 text-emerald-600' : 'bg-teal-50 text-teal-600'}`}>
+        <div
+          className={`p-2.5 rounded-xl shrink-0 ${
+            challenge.locked
+              ? 'bg-gray-100 text-gray-400'
+              : isComplete
+              ? 'bg-emerald-100 text-emerald-600'
+              : 'bg-teal-50 text-teal-600'
+          }`}
+          aria-hidden="true"
+        >
           {challenge.locked ? <Lock className="w-5 h-5" /> : challenge.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="font-semibold text-gray-800 truncate">{challenge.title}</h4>
-            <div className="flex items-center gap-1 shrink-0">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
+          <header className="flex items-center justify-between gap-2">
+            <h4
+              id={`challenge-title-${challenge.id}`}
+              className="font-semibold text-gray-800 truncate"
+            >
+              {challenge.title}
+            </h4>
+            <div className="flex items-center gap-1 shrink-0" aria-label={`Reward: ${challenge.reward} Eco-Credits`}>
+              <Zap className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
               <span className="text-xs font-bold text-amber-600">+{challenge.reward}</span>
             </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-0.5">{challenge.description}</p>
+          </header>
+          <p
+            id={`challenge-desc-${challenge.id}`}
+            className="text-xs text-gray-500 mt-0.5"
+          >
+            {challenge.description}
+          </p>
           <div className="mt-3">
             <div className="flex items-center justify-between text-xs mb-1.5">
-              <span className="text-gray-500">Progress</span>
-              <span className="font-medium text-gray-700" data-testid="challenge-progress">{challenge.progress}/{challenge.total}</span>
+              <span className="text-gray-500" id={progressId}>Progress</span>
+              <span
+                className="font-medium text-gray-700"
+                data-testid="challenge-progress"
+                aria-label={`${challenge.progress} of ${challenge.total} completed`}
+              >
+                {challenge.progress}/{challenge.total}
+              </span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full" style={{ width: `${progressPercent}%` }} />
+            <div
+              className="h-2 bg-gray-100 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={challenge.progress}
+              aria-valuemin={0}
+              aria-valuemax={challenge.total}
+              aria-labelledby={progressId}
+            >
+              <div
+                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
           </div>
           {!challenge.locked && (
             <button
+              type="button"
               onClick={() => setIsClaimed(true)}
               disabled={!isComplete || isClaimed}
-              className={`w-full mt-3 py-2 rounded-lg text-sm font-medium ${
+              className={`w-full mt-3 py-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
                 isClaimed
-                  ? 'bg-gray-100 text-gray-400'
+                  ? 'bg-gray-100 text-gray-400 cursor-default'
                   : isComplete
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
               data-testid={isComplete && !isClaimed ? 'claim-button' : undefined}
+              aria-label={
+                isClaimed
+                  ? 'Reward already claimed'
+                  : isComplete
+                  ? `Claim ${challenge.reward} Eco-Credits reward`
+                  : `Challenge in progress: ${challenge.progress} of ${challenge.total} completed`
+              }
             >
-              {isClaimed ? 'Claimed' : isComplete ? 'Claim Reward' : 'In Progress'}
+              {isClaimed ? (
+                <span className="flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                  Claimed
+                </span>
+              ) : isComplete ? (
+                <span className="flex items-center justify-center gap-1.5">
+                  <Gift className="w-4 h-4" aria-hidden="true" />
+                  Claim Reward
+                </span>
+              ) : (
+                'In Progress'
+              )}
             </button>
+          )}
+          {challenge.locked && (
+            <span className="sr-only">This challenge is locked</span>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -349,37 +493,68 @@ function AIChatbot() {
   };
 
   return (
-    <div className="flex flex-col h-full" data-testid="ai-chatbot">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-        <Sparkles className="w-5 h-5 text-teal-600" />
-        <h3 className="font-semibold text-gray-800">EcoCoach AI</h3>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+    <section
+      className="flex flex-col h-full"
+      data-testid="ai-chatbot"
+      aria-labelledby="chatbot-title"
+    >
+      <header className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+        <Sparkles className="w-5 h-5 text-teal-600" aria-hidden="true" />
+        <h3 id="chatbot-title" className="font-semibold text-gray-800">EcoCoach AI</h3>
+      </header>
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-3"
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+      >
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl ${msg.sender === 'user' ? 'bg-emerald-600 text-white' : 'bg-white/80 border border-gray-100 text-gray-700'}`}>
+          <article
+            key={msg.id}
+            className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-[85%] px-4 py-2.5 rounded-2xl ${
+                msg.sender === 'user'
+                  ? 'bg-emerald-600 text-white rounded-br-md'
+                  : 'bg-white/80 border border-gray-100 text-gray-700 rounded-bl-md'
+              }`}
+            >
               <p className="text-sm">{msg.text}</p>
             </div>
-          </div>
+            <span className="sr-only">{msg.sender === 'user' ? 'You said' : 'EcoCoach AI said'}:</span>
+          </article>
         ))}
       </div>
-      <div className="px-4 pb-3">
+      <form
+        className="px-4 pb-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSend();
+        }}
+      >
         <div className="flex gap-2">
+          <label htmlFor="chat-input" className="sr-only">Ask about eco-friendly swaps</label>
           <input
+            id="chat-input"
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask about eco-friendly swaps..."
-            className="flex-1 px-4 py-2.5 text-sm bg-white/70 border border-gray-100 rounded-xl"
+            className="flex-1 px-4 py-2.5 text-sm bg-white/70 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             data-testid="chat-input"
           />
-          <button onClick={() => handleSend()} className="p-2.5 bg-emerald-600 text-white rounded-xl" data-testid="send-button">
-            <Send className="w-5 h-5" />
+          <button
+            type="submit"
+            className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            data-testid="send-button"
+            aria-label="Send message"
+          >
+            <Send className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
-      </div>
-    </div>
+      </form>
+    </section>
   );
 }
 
@@ -413,14 +588,25 @@ export function EcoSyncDashboard({
     icon: challengeIcons[i] || <Leaf className="w-5 h-5" key="leaf" />,
   }));
 
+  const totalCO2 = chartData.reduce((sum, d) => sum + d.value, 0);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-gray-100" data-testid="eco-dashboard">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border border-white/20 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-">
+    <div
+      className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-gray-100"
+      data-testid="eco-dashboard"
+    >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-emerald-600 focus:text-white focus:rounded-lg"
+      >
+        Skip to main content
+      </a>
+
+      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border border-white/20 shadow-sm" role="banner">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl shadow-md">
+              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl shadow-md" aria-hidden="true">
                 <Leaf className="w-6 h-6 text-white" data-testid="logo-icon" />
               </div>
               <div>
@@ -428,73 +614,131 @@ export function EcoSyncDashboard({
                 <p className="text-xs text-gray-500">Carbon Footprint Tracker</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-100">
-                <Zap className="w-4 h-4 text-amber-500" />
-                <span className="text-sm font-semibold text-amber-700" data-testid="credits-display">{ecoCredits} Credits</span>
-              </div>
-            </div>
+            <nav aria-label="User statistics">
+              <ul className="flex items-center gap-3">
+                <li>
+                  <div
+                    className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-100"
+                    aria-label={`You have ${ecoCredits} Eco-Credits`}
+                  >
+                    <Zap className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                    <span
+                      className="text-sm font-semibold text-amber-700"
+                      data-testid="credits-display"
+                    >
+                      {ecoCredits} Credits
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main
+        id="main-content"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8"
+        role="main"
+        aria-label="EcoSync Dashboard"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column */}
           <div className="lg:col-span-8 space-y-6">
-            {/* Hero Section */}
-            <section className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-6">
+            <section
+              className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-6"
+              aria-labelledby="hero-section-title"
+            >
+              <h2 id="hero-section-title" className="sr-only">Weekly emissions overview</h2>
               <div className="flex flex-col lg:flex-row gap-6">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Target className="w-5 h-5 text-emerald-600" />
-                    <h2 className="text-lg font-semibold text-gray-800">Weekly CO2 Breakdown</h2>
-                  </div>
+                  <header className="flex items-center gap-2 mb-4">
+                    <Target className="w-5 h-5 text-emerald-600" aria-hidden="true" />
+                    <h3 className="text-lg font-semibold text-gray-800">Weekly CO2 Breakdown</h3>
+                  </header>
                   <CO2Chart data={chartData} />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-4">
-                    <TreeDeciduous className="w-5 h-5 text-emerald-600" />
-                    <h2 className="text-lg font-semibold text-gray-800">Your Virtual Forest</h2>
-                  </div>
+                  <header className="flex items-center gap-2 mb-4">
+                    <TreeDeciduous className="w-5 h-5 text-emerald-600" aria-hidden="true" />
+                    <h3 className="text-lg font-semibold text-gray-800">Your Virtual Forest</h3>
+                  </header>
                   <VirtualForest credits={ecoCredits} />
                 </div>
               </div>
             </section>
 
-            {/* KPI Cards */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <KPICard title="Current Footprint" value="12.0 kg" subtitle="CO2 this week" icon={<Leaf className="w-5 h-5 text-emerald-600" />} trend="8% vs last week" trendUp />
-              <KPICard title="Guild Rank" value="#12" subtitle="EcoWarriors Guild" icon={<Trophy className="w-5 h-5 text-amber-500" />} />
-              <KPICard title="Total Saved" value="156 kg" subtitle="CO2 saved all time" icon={<Award className="w-5 h-5 text-teal-600" />} />
+            <section
+              className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+              aria-labelledby="kpi-section-title"
+            >
+              <h2 id="kpi-section-title" className="sr-only">Key performance indicators</h2>
+              <KPICard
+                title="Current Footprint"
+                value="12.0 kg"
+                subtitle="CO2 this week"
+                icon={<Leaf className="w-5 h-5 text-emerald-600" />}
+                trend="8% vs last week"
+                trendUp
+              />
+              <KPICard
+                title="Guild Rank"
+                value="#12"
+                subtitle="EcoWarriors Guild"
+                icon={<Trophy className="w-5 h-5 text-amber-500" />}
+              />
+              <KPICard
+                title="Total Saved"
+                value="156 kg"
+                subtitle="CO2 saved all time"
+                icon={<Award className="w-5 h-5 text-teal-600" />}
+              />
             </section>
 
-            {/* Receipt Scanner */}
-            <section className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-6">
+            <section
+              className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-6"
+              aria-labelledby="scanner-section-title"
+            >
+              <h2 id="scanner-section-title" className="sr-only">Receipt scanner</h2>
               <ReceiptScanner />
             </section>
 
-            {/* Challenges */}
-            <section className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
+            <section
+              className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-6"
+              aria-labelledby="challenges-section-title"
+            >
+              <header className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-emerald-600" />
-                  <h2 className="text-lg font-semibold text-gray-800">Active Challenges</h2>
+                  <Target className="w-5 h-5 text-emerald-600" aria-hidden="true" />
+                  <h2 id="challenges-section-title" className="text-lg font-semibold text-gray-800">Active Challenges</h2>
                 </div>
-                <button className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700">
-                  View All <ChevronRight className="w-4 h-4" />
+                <button
+                  type="button"
+                  className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded px-2 py-1"
+                  aria-label="View all challenges"
+                >
+                  View All <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              </header>
+              <ul
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                role="list"
+                aria-label="Active challenges"
+              >
                 {challengesWithIcons.map((challenge, i) => (
-                  <ChallengeCard key={challenge.id || i} challenge={challenge as Challenge & { icon: React.ReactNode }} />
+                  <li key={challenge.id || i}>
+                    <ChallengeCard challenge={challenge as Challenge & { icon: React.ReactNode }} />
+                  </li>
                 ))}
-              </div>
+              </ul>
             </section>
           </div>
 
-          {/* Right Column - AI Chatbot */}
-          <aside className="lg:col-span-4">
+          <aside
+            className="lg:col-span-4"
+            role="complementary"
+            aria-labelledby="chatbot-aside-title"
+          >
+            <h2 id="chatbot-aside-title" className="sr-only">AI Chatbot Assistant</h2>
             <div className="lg:sticky lg:top-24">
               <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl h-[600px] flex flex-col overflow-hidden">
                 <AIChatbot />
@@ -504,11 +748,10 @@ export function EcoSyncDashboard({
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-8 py-6 border-t border-gray-100 bg-white/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-">
+      <footer className="mt-8 py-6 border-t border-gray-100 bg-white/50" role="contentinfo">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center">
-            <span className="text-xs text-gray-500">Making sustainable living simple and rewarding</span>
+            <p className="text-xs text-gray-500">Making sustainable living simple and rewarding</p>
           </div>
         </div>
       </footer>

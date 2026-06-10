@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   Leaf,
   TrendingDown,
@@ -54,28 +54,32 @@ interface Message {
 }
 
 function CO2Chart({ data }: { data: ChartData[] }) {
-  const total = data.reduce((sum, d) => sum + d.value, 0);
-  let currentAngle = -90;
+  const { total, segments } = useMemo(() => {
+    const computedTotal = data.reduce((sum, d) => sum + d.value, 0);
+    let currentAngle = -90;
 
-  const polarToCartesian = (cx: number, cy: number, r: number, angle: number) => {
-    const rad = ((angle - 90) * Math.PI) / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-  };
+    const polarToCartesian = (cx: number, cy: number, r: number, angle: number) => {
+      const rad = ((angle - 90) * Math.PI) / 180;
+      return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+    };
 
-  const describeArc = (x: number, y: number, r: number, startAngle: number, endAngle: number) => {
-    const start = polarToCartesian(x, y, r, endAngle);
-    const end = polarToCartesian(x, y, r, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-    return ['M', start.x, start.y, 'A', r, r, 0, largeArcFlag, '0', end.x, end.y].join(' ');
-  };
+    const describeArc = (x: number, y: number, r: number, startAngle: number, endAngle: number) => {
+      const start = polarToCartesian(x, y, r, endAngle);
+      const end = polarToCartesian(x, y, r, startAngle);
+      const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+      return ['M', start.x, start.y, 'A', r, r, 0, largeArcFlag, '0', end.x, end.y].join(' ');
+    };
 
-  const segments = data.map((d) => {
-    const angle = (d.value / total) * 360;
-    const startAngle = currentAngle + 90;
-    const endAngle = startAngle + angle;
-    currentAngle += angle;
-    return { ...d, path: describeArc(100, 100, 80, startAngle, endAngle) };
-  });
+    const computedSegments = data.map((d) => {
+      const angle = (d.value / computedTotal) * 360;
+      const startAngle = currentAngle + 90;
+      const endAngle = startAngle + angle;
+      currentAngle += angle;
+      return { ...d, path: describeArc(100, 100, 80, startAngle, endAngle) };
+    });
+
+    return { total: computedTotal, segments: computedSegments };
+  }, [data]);
 
   return (
     <figure className="flex flex-col items-center" data-testid="co2-chart" aria-labelledby="chart-title">
@@ -483,14 +487,25 @@ function AIChatbot() {
   ]);
   const [inputValue, setInputValue] = useState('');
 
-  const handleSend = (text: string = inputValue) => {
-    if (!text.trim()) return;
-    setMessages((prev) => [...prev, { id: Date.now(), sender: 'user', text: text.trim() }]);
+  const sanitizeInput = useCallback((text: string): string => {
+    return text
+      .trim()
+      .slice(0, 500)
+      .replace(/[<>]/g, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+=/gi, '');
+  }, []);
+
+  const handleSend = useCallback((text: string = inputValue) => {
+    const sanitized = sanitizeInput(text);
+    if (!sanitized) return;
+
+    setMessages((prev) => [...prev, { id: Date.now(), sender: 'user', text: sanitized }]);
     setInputValue('');
     setTimeout(() => {
       setMessages((prev) => [...prev, { id: Date.now() + 1, sender: 'ai', text: "Great question! I'm analyzing your habits to provide personalized suggestions..." }]);
     }, 1000);
-  };
+  }, [inputValue, sanitizeInput]);
 
   return (
     <section
@@ -541,14 +556,16 @@ function AIChatbot() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask about eco-friendly swaps..."
+            maxLength={500}
             className="flex-1 px-4 py-2.5 text-sm bg-white/70 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             data-testid="chat-input"
           />
           <button
             type="submit"
-            className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            disabled={!inputValue.trim()}
+            className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
             data-testid="send-button"
-            aria-label="Send message"
+            aria-label={inputValue.trim() ? 'Send message' : 'Enter a message to send'}
           >
             <Send className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -577,18 +594,20 @@ export function EcoSyncDashboard({
   ],
   ecoCredits = 450,
 }: EcoSyncDashboardProps) {
-  const challengeIcons = [
+  const challengeIcons = useMemo(() => [
     <UtensilsCrossed className="w-5 h-5" key="utensils" />,
     <Car className="w-5 h-5" key="car" />,
     <Lightbulb className="w-5 h-5" key="lightbulb" />,
-  ];
+  ], []);
 
-  const challengesWithIcons = challenges.map((c, i) => ({
-    ...c,
-    icon: challengeIcons[i] || <Leaf className="w-5 h-5" key="leaf" />,
-  }));
+  const challengesWithIcons = useMemo(() => {
+    return challenges.map((c, i) => ({
+      ...c,
+      icon: challengeIcons[i] || <Leaf className="w-5 h-5" key="leaf" />,
+    }));
+  }, [challenges, challengeIcons]);
 
-  const totalCO2 = chartData.reduce((sum, d) => sum + d.value, 0);
+  const totalCO2 = useMemo(() => chartData.reduce((sum, d) => sum + d.value, 0), [chartData]);
 
   return (
     <div

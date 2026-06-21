@@ -886,6 +886,28 @@ function AIChatbot() {
   );
 }
 
+/**
+ * Default chart data for CO2 breakdown visualization.
+ * Defined outside component to prevent recreation on every render.
+ */
+const DEFAULT_CHART_DATA: ChartData[] = [
+  { category: 'Transport', value: 4.2, color: '#3b82f6' },
+  { category: 'Food', value: 5.8, color: '#f59e0b' },
+  { category: 'Utilities', value: 2.0, color: '#ef4444' },
+];
+
+/**
+ * Default challenges for gamification system.
+ * Defined outside component to prevent recreation on every render.
+ */
+const DEFAULT_CHALLENGES: Challenge[] = [
+  { id: '1', title: 'Meatless Monday Quest', description: 'Go meat-free for one day this week', reward: 50, progress: 0, total: 1, locked: false },
+  { id: '2', title: 'Commute Commando', description: 'Walk or bike 5 miles instead of driving', reward: 75, progress: 3, total: 5, locked: false },
+  { id: '3', title: 'Unplugged Evening', description: 'Turn off all electronics for 3 hours', reward: 100, progress: 0, total: 1, locked: true },
+];
+
+const DEFAULT_ECO_CREDITS = 450;
+
 interface EcoSyncDashboardProps {
   chartData?: ChartData[];
   challenges?: Challenge[];
@@ -893,17 +915,9 @@ interface EcoSyncDashboardProps {
 }
 
 export function EcoSyncDashboard({
-  chartData = [
-    { category: 'Transport', value: 4.2, color: '#3b82f6' },
-    { category: 'Food', value: 5.8, color: '#f59e0b' },
-    { category: 'Utilities', value: 2.0, color: '#ef4444' },
-  ],
-  challenges = [
-    { id: '1', title: 'Meatless Monday Quest', description: 'Go meat-free for one day this week', reward: 50, progress: 0, total: 1, locked: false },
-    { id: '2', title: 'Commute Commando', description: 'Walk or bike 5 miles instead of driving', reward: 75, progress: 3, total: 5, locked: false },
-    { id: '3', title: 'Unplugged Evening', description: 'Turn off all electronics for 3 hours', reward: 100, progress: 0, total: 1, locked: true },
-  ],
-  ecoCredits = 450,
+  chartData = DEFAULT_CHART_DATA,
+  challenges = DEFAULT_CHALLENGES,
+  ecoCredits = DEFAULT_ECO_CREDITS,
 }: EcoSyncDashboardProps) {
   const challengeIcons = useMemo(() => [
     <UtensilsCrossed className="w-5 h-5" key="utensils" />,

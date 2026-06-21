@@ -795,12 +795,16 @@ function AIChatbot() {
   const [inputValue, setInputValue] = useState('');
 
   const sanitizeInput = useCallback((text: string): string => {
+    const MAX_INPUT_LENGTH = 250;
     return text
       .trim()
-      .slice(0, 500)
+      .slice(0, MAX_INPUT_LENGTH)
       .replace(/[<>]/g, '')
       .replace(/javascript:/gi, '')
-      .replace(/on\w+=/gi, '');
+      .replace(/on\w+=/gi, '')
+      .replace(/data:/gi, '')
+      .replace(/vbscript:/gi, '')
+      .replace(/[^\x20-\x7E\n\r]/g, '');
   }, []);
 
   const handleSend = useCallback((text: string = inputValue) => {
@@ -863,7 +867,7 @@ function AIChatbot() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask about eco-friendly swaps..."
-            maxLength={500}
+            maxLength={250}
             className="flex-1 px-4 py-2.5 text-sm bg-white/70 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             data-testid="chat-input"
           />

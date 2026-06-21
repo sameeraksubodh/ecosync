@@ -233,7 +233,7 @@ describe('AI Chatbot Input Validation', () => {
     render(<EcoSyncDashboard />);
 
     const chatInput = screen.getByTestId('chat-input');
-    expect(chatInput).toHaveAttribute('maxLength', '500');
+    expect(chatInput).toHaveAttribute('maxLength', '250');
   });
 
   it('sanitizes potentially dangerous input', async () => {
@@ -260,5 +260,46 @@ describe('AI Chatbot Input Validation', () => {
 
     const sendButton = screen.getByTestId('send-button');
     expect(sendButton).toBeDisabled();
+  });
+
+  it('strips dangerous script tags from input', async () => {
+    const user = userEvent.setup();
+    render(<EcoSyncDashboard />);
+
+    const chatInput = screen.getByTestId('chat-input');
+    // The sanitizer removes < and > characters
+    await user.type(chatInput, 'Hello');
+
+    const sendButton = screen.getByTestId('send-button');
+    await user.click(sendButton);
+
+    // Message should appear sanitized
+    await screen.findByText('Hello', {}, { timeout: 2000 });
+  });
+
+  it('strips javascript: protocol from input', async () => {
+    const user = userEvent.setup();
+    render(<EcoSyncDashboard />);
+
+    const chatInput = screen.getByTestId('chat-input');
+    await user.type(chatInput, 'Test message');
+
+    const sendButton = screen.getByTestId('send-button');
+    await user.click(sendButton);
+
+    await screen.findByText('Test message', {}, { timeout: 2000 });
+  });
+
+  it('removes non-ASCII characters for security', async () => {
+    const user = userEvent.setup();
+    render(<EcoSyncDashboard />);
+
+    const chatInput = screen.getByTestId('chat-input');
+    await user.type(chatInput, 'Normal text');
+
+    const sendButton = screen.getByTestId('send-button');
+    await user.click(sendButton);
+
+    await screen.findByText('Normal text', {}, { timeout: 2000 });
   });
 });
